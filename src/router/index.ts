@@ -1,7 +1,10 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 
 import Register from '@/view/Register.vue'
 import Login from '@/view/Login.vue'
+import Role from "@/view/Role.vue";
+import Users from "@/view/Users.vue";
+import Dashboard from "@/view/Dashboard.vue";
 
 const routes = [
     {
@@ -23,6 +26,21 @@ const routes = [
         meta: {
             guestOnly: true
         }
+    },
+    {
+        path: '/users',
+        name: 'users',
+        component: Users
+    },
+    {
+        path: '/roles',
+        name: 'role',
+        component: Role
+    },
+    {
+        path: '/dashboard',
+        name: 'dashboard',
+        component: Dashboard
     },
     {
         path: '/:pathMatch(.*)*',

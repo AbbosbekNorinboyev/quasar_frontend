@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue'
-import {useRoute} from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 import {
   matAdd,
   matAdminPanelSettings,
@@ -21,6 +21,9 @@ import {
   matTrendingUp,
   matDashboard,
 } from '@quasar/extras/material-icons'
+import {getRoles} from '@/service/roleService.ts'
+
+const router = useRouter()
 
 type NavItem = {
   label: string
@@ -109,6 +112,14 @@ const pageTitle = computed(() => {
 
 const selectPage = (page: string) => {
   activePage.value = page
+
+  if (page === 'dashboard') {
+    router.push('/dashboard')
+  } else if (page === 'users') {
+    router.push('/users')
+  } else if (page === 'roles') {
+    router.push('/roles')
+  }
 }
 </script>
 
