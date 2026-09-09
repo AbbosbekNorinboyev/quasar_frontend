@@ -113,7 +113,7 @@ const selectPage = (page: string) => {
 </script>
 
 <template>
-  <router-view v-if="route.name === 'register'" />
+  <router-view v-if="route.name === 'register'"/>
 
   <q-layout v-else view="hHh LpR fFf" class="app-shell">
     <q-header bordered class="bg-white text-dark">

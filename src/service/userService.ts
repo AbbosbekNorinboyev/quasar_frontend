@@ -1,74 +1,74 @@
 import api, {clearAccessToken, setAccessToken} from '@/api/axios'
 
+const API_URL = '/users'
+
+export type RegisterRequest = {
+    fullName: string
+    phoneNumber: string
+    email: string
+    username: string
+    password: string
+    birthDate: string
+    roleIds?: number[]
+}
+
+export interface LoginRequest {
+    username: string
+    password: string
+}
+
 export type User = {
-  id?: number | string
-  name: string
-  email: string
-  username?: string
-  phoneNumber?: string
-  role?: string
-  status?: string
-}
-
-export type RegisterPayload = {
-  fullName: string
-  phoneNumber: string
-  email: string
-  username: string
-  password: string
-  birthDate: string
-}
-
-export type LoginPayload = {
-  username: string
-  password: string
+    id?: number | string
+    name: string
+    email: string
+    username?: string
+    phoneNumber?: string
+    role?: string
+    status?: string
 }
 
 export type AuthResponse = {
-  accessToken?: string
-  access_token?: string
-  token?: string
-  refreshToken?: string
-  refresh_token?: string
-  user?: User
+    accessToken?: string
+    access_token?: string
+    token?: string
+    refreshToken?: string
+    refresh_token?: string
+    user?: User
 }
 
 const getToken = (response: AuthResponse): string | undefined =>
-  response.accessToken ?? response.access_token ?? response.token
+    response.accessToken ?? response.access_token ?? response.token
 
-export const register = async (payload: RegisterPayload): Promise<AuthResponse> => {
-  const response = await api.post<AuthResponse>('/auth/register', payload)
-  const token = getToken(response.data)
-
-  if (token) {
-    setAccessToken(token)
-  }
-
-  return response.data
+export const register = (request: RegisterRequest) => {
+    return api.post(`${API_URL}/register`, request)
 }
 
-export const login = async (payload: LoginPayload): Promise<AuthResponse> => {
-  const response = await api.post<AuthResponse>('/auth/login', payload)
-  const token = getToken(response.data)
-
-  if (!token) {
-    throw new Error('Login response does not contain a JWT access token')
-  }
-
-  setAccessToken(token)
-  return response.data
+export const login = (request: LoginRequest) => {
+    return api.post(`${API_URL}/login`, request)
 }
 
 export const logout = (): void => {
-  clearAccessToken()
+    clearAccessToken()
 }
 
-export const getUsers = async (): Promise<User[]> => {
-  const response = await api.get<User[]>('/users')
-  return response.data
+export function getUsers(params: {
+    // page?: number,
+    // size?: number,
+    // id?: number,
+    // fullName?: string,
+    // phoneNumber?: string,
+    // email?: string,
+    // username?: string,
+    // birthDate?: string,
+    // roleId?: number,
+    // status?: string,
+    // createdAt?: string,
+    // updatedAt?: string
+}) {
+    return api.get(`${API_URL}/getAll`, {params})
 }
 
 export const getUser = async (id: number | string): Promise<User> => {
-  const response = await api.get<User>(`/users/${id}`)
-  return response.data
+    const response = await api.get<User>(`/users/${id}`)
+    return response.data
 }

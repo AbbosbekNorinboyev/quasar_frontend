@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref} from 'vue'
 import {useRouter} from 'vue-router'
-import axios from 'axios'
+import {login} from "@/service/userService.ts"
 
 const router = useRouter()
 
@@ -15,19 +15,16 @@ const handleLogin = async () => {
     error.value = ''
     loading.value = true
 
-    const response = await axios.post(
-        'http://localhost:8080/api/auth/login',
-        {
-          username: username.value,
-          password: password.value
-        }
-    )
+    const response = await login({
+      username: username.value,
+      password: password.value
+    })
 
     // JWT tokenni saqlaymiz
     localStorage.setItem('token', response.data.token)
 
     // Home sahifaga o'tamiz
-    await router.push('/home')
+    await router.push('/dashboard')
 
   } catch (e) {
     console.error('Login failed:', e)
