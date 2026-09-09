@@ -4,6 +4,7 @@ import 'quasar/dist/quasar.css'
 
 import App from './App.vue'
 import './assets/main.css'
+import router from './router'
 
 createApp(App)
     .use(Quasar, {
@@ -15,4 +16,5 @@ createApp(App)
             },
         },
     })
+    .use(router)
     .mount('#app')

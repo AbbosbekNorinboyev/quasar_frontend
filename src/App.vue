@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue'
+import {useRoute} from 'vue-router'
 import {
   matAdd,
   matAdminPanelSettings,
@@ -45,6 +46,7 @@ type Role = {
 
 const drawerOpen = ref(true)
 const activePage = ref('dashboard')
+const route = useRoute()
 
 const navItems: NavItem[] = [
   {label: 'Dashboard', icon: matDashboard, value: 'dashboard'},
@@ -111,7 +113,9 @@ const selectPage = (page: string) => {
 </script>
 
 <template>
-  <q-layout view="hHh LpR fFf" class="app-shell">
+  <router-view v-if="route.name === 'register'" />
+
+  <q-layout v-else view="hHh LpR fFf" class="app-shell">
     <q-header bordered class="bg-white text-dark">
       <q-toolbar class="app-toolbar">
         <q-btn
