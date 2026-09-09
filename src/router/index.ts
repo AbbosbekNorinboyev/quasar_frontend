@@ -1,6 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 
 import Register from '@/view/Register.vue'
+import Login from '@/view/Login.vue'
 
 const routes = [
     {
@@ -18,6 +19,13 @@ const routes = [
     {
         path: '/:pathMatch(.*)*',
         redirect: '/register'
+    },
+    {
+        path: '/login',
+        component: Login,
+        meta: {
+            guestOnly: true
+        }
     }
 ]
 
