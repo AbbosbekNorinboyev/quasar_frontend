@@ -2,5 +2,5 @@
 
 </script>
 <template>
-  <h1>Users</h1>
+  <h1>Activity</h1>
 </template>

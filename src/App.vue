@@ -140,6 +140,7 @@ const leftDrawerOpen = ref(true)
         <q-item
             clickable
             v-ripple
+            to="/activity"
         >
           <q-item-section avatar>
             <q-icon :name="matSchedule"/>
@@ -171,6 +172,7 @@ const leftDrawerOpen = ref(true)
         <q-item
             clickable
             v-ripple
+            to="/help"
         >
           <q-item-section avatar>
             <q-icon :name="matHelpOutline"/>
