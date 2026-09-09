@@ -1,5 +1,25 @@
 <script setup lang="ts">
 import {computed, ref} from 'vue'
+import {
+  matAdd,
+  matAdminPanelSettings,
+  matBadge,
+  matExpandMore,
+  matHelpOutline,
+  matHowToReg,
+  matMailOutline,
+  matMenu,
+  matMoreVert,
+  matNotificationsNone,
+  matPeople,
+  matSchedule,
+  matSearch,
+  matSecurity,
+  matSettings,
+  matShield,
+  matTrendingUp,
+  matDashboard,
+} from '@quasar/extras/material-icons'
 
 type NavItem = {
   label: string
@@ -27,9 +47,9 @@ const drawerOpen = ref(true)
 const activePage = ref('dashboard')
 
 const navItems: NavItem[] = [
-  {label: 'Dashboard', icon: 'dashboard', value: 'dashboard'},
-  {label: 'Users', icon: 'people', value: 'users'},
-  {label: 'Roles', icon: 'admin_panel_settings', value: 'roles'},
+  {label: 'Dashboard', icon: matDashboard, value: 'dashboard'},
+  {label: 'Users', icon: matPeople, value: 'users'},
+  {label: 'Roles', icon: matAdminPanelSettings, value: 'roles'},
 ]
 
 const users: User[] = [
@@ -98,7 +118,7 @@ const selectPage = (page: string) => {
             flat
             round
             dense
-            icon="menu"
+            :icon="matMenu"
             color="grey-8"
             aria-label="Toggle navigation"
             @click="drawerOpen = !drawerOpen"
@@ -109,7 +129,7 @@ const selectPage = (page: string) => {
           BRB Admin
         </q-toolbar-title>
 
-        <q-btn flat round icon="notifications_none" color="grey-7" aria-label="Notifications">
+        <q-btn flat round :icon="matNotificationsNone" color="grey-7" aria-label="Notifications">
           <q-badge floating rounded color="negative">3</q-badge>
         </q-btn>
         <q-separator vertical inset class="q-mx-md"/>
@@ -118,7 +138,7 @@ const selectPage = (page: string) => {
           <div class="text-weight-medium">Ali Valiyev</div>
           <div class="text-caption text-grey-6">Administrator</div>
         </div>
-        <q-btn flat round dense icon="expand_more" color="grey-7" aria-label="Open profile menu"/>
+        <q-btn flat round dense :icon="matExpandMore" color="grey-7" aria-label="Open profile menu"/>
       </q-toolbar>
     </q-header>
 
@@ -148,20 +168,20 @@ const selectPage = (page: string) => {
         <q-list padding>
           <q-item v-ripple clickable class="nav-item">
             <q-item-section avatar>
-              <q-icon name="settings" size="21px"/>
+              <q-icon :name="matSettings" size="21px"/>
             </q-item-section>
             <q-item-section>Settings</q-item-section>
           </q-item>
           <q-item v-ripple clickable class="nav-item">
             <q-item-section avatar>
-              <q-icon name="help_outline" size="21px"/>
+              <q-icon :name="matHelpOutline" size="21px"/>
             </q-item-section>
             <q-item-section>Help center</q-item-section>
           </q-item>
         </q-list>
 
         <div class="drawer-footer">
-          <q-icon name="security" color="primary" size="24px"/>
+          <q-icon :name="matSecurity" color="primary" size="24px"/>
           <div class="q-ml-sm">
             <div class="text-weight-medium">Secure workspace</div>
             <div class="text-caption text-grey-6">Your data is protected</div>
@@ -184,7 +204,7 @@ const selectPage = (page: string) => {
                 v-if="activePage !== 'dashboard'"
                 unelevated
                 color="primary"
-                icon="add"
+                :icon="matAdd"
                 :label="activePage === 'users' ? 'Add user' : 'Add role'"
                 no-caps
             />
@@ -200,11 +220,11 @@ const selectPage = (page: string) => {
                         <div class="text-caption text-grey-7">Total users</div>
                         <div class="text-h4 text-weight-bold q-mt-sm">102</div>
                         <div class="text-caption text-positive q-mt-sm">
-                          <q-icon name="trending_up"/>
+                          <q-icon :name="matTrendingUp"/>
                           12% this month
                         </div>
                       </div>
-                      <q-avatar color="blue-1" text-color="primary" icon="people"/>
+                      <q-avatar color="blue-1" text-color="primary" :icon="matPeople"/>
                     </div>
                   </q-card-section>
                 </q-card>
@@ -217,11 +237,11 @@ const selectPage = (page: string) => {
                         <div class="text-caption text-grey-7">Active users</div>
                         <div class="text-h4 text-weight-bold q-mt-sm">98</div>
                         <div class="text-caption text-positive q-mt-sm">
-                          <q-icon name="trending_up"/>
+                          <q-icon :name="matTrendingUp"/>
                           8% this month
                         </div>
                       </div>
-                      <q-avatar color="green-1" text-color="positive" icon="how_to_reg"/>
+                      <q-avatar color="green-1" text-color="positive" :icon="matHowToReg"/>
                     </div>
                   </q-card-section>
                 </q-card>
@@ -235,7 +255,7 @@ const selectPage = (page: string) => {
                         <div class="text-h4 text-weight-bold q-mt-sm">8</div>
                         <div class="text-caption text-grey-6 q-mt-sm">2 custom roles</div>
                       </div>
-                      <q-avatar color="purple-1" text-color="deep-purple" icon="badge"/>
+                      <q-avatar color="purple-1" text-color="deep-purple" :icon="matBadge"/>
                     </div>
                   </q-card-section>
                 </q-card>
@@ -248,11 +268,11 @@ const selectPage = (page: string) => {
                         <div class="text-caption text-grey-7">Pending invites</div>
                         <div class="text-h4 text-weight-bold q-mt-sm">6</div>
                         <div class="text-caption text-warning q-mt-sm">
-                          <q-icon name="schedule"/>
+                          <q-icon :name="matSchedule"/>
                           Needs attention
                         </div>
                       </div>
-                      <q-avatar color="orange-1" text-color="orange-8" icon="mail_outline"/>
+                      <q-avatar color="orange-1" text-color="orange-8" :icon="matMailOutline"/>
                     </div>
                   </q-card-section>
                 </q-card>
@@ -306,7 +326,7 @@ const selectPage = (page: string) => {
                   <q-list separator>
                     <q-item v-for="role in roles" :key="role.name" class="q-py-md">
                       <q-item-section avatar>
-                        <q-avatar :color="`${role.color}-1`" :text-color="role.color" icon="shield"/>
+                        <q-avatar :color="`${role.color}-1`" :text-color="role.color" :icon="matShield"/>
                       </q-item-section>
                       <q-item-section>
                         <q-item-label class="text-weight-medium">{{ role.name }}</q-item-label>
@@ -330,7 +350,7 @@ const selectPage = (page: string) => {
               </div>
               <q-input dense outlined placeholder="Search" class="search-input">
                 <template #prepend>
-                  <q-icon name="search"/>
+                  <q-icon :name="matSearch"/>
                 </template>
               </q-input>
             </q-card-section>
@@ -352,14 +372,14 @@ const selectPage = (page: string) => {
                   </q-chip>
                 </q-item-section>
                 <q-item-section side>
-                  <q-btn flat round dense icon="more_vert"/>
+                  <q-btn flat round dense :icon="matMoreVert"/>
                 </q-item-section>
               </q-item>
             </q-list>
             <q-list v-else separator>
               <q-item v-for="role in roles" :key="role.name" class="q-py-md">
                 <q-item-section avatar>
-                  <q-avatar :color="`${role.color}-1`" :text-color="role.color" icon="shield"/>
+                  <q-avatar :color="`${role.color}-1`" :text-color="role.color" :icon="matShield"/>
                 </q-item-section>
                 <q-item-section>
                   <q-item-label class="text-weight-medium">{{ role.name }}</q-item-label>
@@ -367,7 +387,7 @@ const selectPage = (page: string) => {
                 </q-item-section>
                 <q-item-section side>{{ role.users }} users</q-item-section>
                 <q-item-section side>
-                  <q-btn flat round dense icon="more_vert"/>
+                  <q-btn flat round dense :icon="matMoreVert"/>
                 </q-item-section>
               </q-item>
             </q-list>
