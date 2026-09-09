@@ -51,7 +51,8 @@ export const logout = (): void => {
     clearAccessToken()
 }
 
-export function getUsers(params: {
+export function getUsers(
+    // params: {
     // page?: number,
     // size?: number,
     // id?: number,
@@ -64,8 +65,9 @@ export function getUsers(params: {
     // status?: string,
     // createdAt?: string,
     // updatedAt?: string
-}) {
-    return api.get(`${API_URL}/getAll`, {params})
+// }
+) {
+    return api.get(`${API_URL}/getAll`)
 }
 
 export const getUser = async (id: number | string): Promise<User> => {
