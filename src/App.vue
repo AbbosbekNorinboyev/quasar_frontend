@@ -44,6 +44,7 @@ const leftDrawerOpen = ref(true)
             flat
             round
             :icon="matSettings"
+            to="/settings"
         />
 
       </q-toolbar>
