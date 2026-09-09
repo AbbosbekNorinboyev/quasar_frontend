@@ -1,5 +1,15 @@
 <script setup lang="ts">
 import {ref} from 'vue'
+import {
+  matAdminPanelSettings,
+  matDashboard,
+  matHelpOutline,
+  matMenu,
+  matNotificationsNone,
+  matPeople,
+  matSchedule,
+  matSettings,
+} from '@quasar/extras/material-icons'
 
 const leftDrawerOpen = ref(true)
 </script>
@@ -8,35 +18,51 @@ const leftDrawerOpen = ref(true)
   <q-layout view="lHh Lpr lFf">
 
     <!-- HEADER -->
-    <q-toolbar>
+    <q-header elevated class="bg-white text-dark">
+      <q-toolbar>
 
-      <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="leftDrawerOpen = !leftDrawerOpen"
-      />
+        <q-btn
+            flat
+            dense
+            round
+            :icon="matMenu"
+            aria-label="Menu"
+            @click="leftDrawerOpen = !leftDrawerOpen"
+        />
 
-      <q-toolbar-title>
-        Admin Panel
-      </q-toolbar-title>
+        <q-toolbar-title class="text-weight-bold">
+          Admin Panel
+        </q-toolbar-title>
 
-    </q-toolbar>
+        <q-btn
+            flat
+            round
+            :icon="matNotificationsNone"
+        />
 
-    <!-- Sidebar -->
+        <q-btn
+            flat
+            round
+            :icon="matSettings"
+        />
+
+      </q-toolbar>
+    </q-header>
+
+
+    <!-- SIDEBAR -->
     <q-drawer
         v-model="leftDrawerOpen"
         show-if-above
         bordered
-        :width="250"
+        :width="260"
     >
 
       <q-list padding>
 
-        <!-- Logo / title -->
+        <!-- LOGO -->
         <q-item class="q-mb-md">
+
           <q-item-section avatar>
             <q-avatar color="primary" text-color="white">
               A
@@ -52,13 +78,13 @@ const leftDrawerOpen = ref(true)
               Management
             </q-item-label>
           </q-item-section>
-        </q-item>
 
+        </q-item>
 
         <q-separator class="q-mb-md"/>
 
 
-        <!-- Dashboard -->
+        <!-- DASHBOARD -->
         <q-item
             clickable
             v-ripple
@@ -66,7 +92,7 @@ const leftDrawerOpen = ref(true)
             exact
         >
           <q-item-section avatar>
-            <q-icon name="dashboard"/>
+            <q-icon :name="matDashboard"/>
           </q-item-section>
 
           <q-item-section>
@@ -75,14 +101,14 @@ const leftDrawerOpen = ref(true)
         </q-item>
 
 
-        <!-- Users -->
+        <!-- USERS -->
         <q-item
             clickable
             v-ripple
             to="/users"
         >
           <q-item-section avatar>
-            <q-icon name="people"/>
+            <q-icon :name="matPeople"/>
           </q-item-section>
 
           <q-item-section>
@@ -91,14 +117,14 @@ const leftDrawerOpen = ref(true)
         </q-item>
 
 
-        <!-- Roles -->
+        <!-- ROLES -->
         <q-item
             clickable
             v-ripple
             to="/roles"
         >
           <q-item-section avatar>
-            <q-icon name="admin_panel_settings"/>
+            <q-icon :name="matAdminPanelSettings"/>
           </q-item-section>
 
           <q-item-section>
@@ -110,18 +136,48 @@ const leftDrawerOpen = ref(true)
         <q-separator class="q-my-md"/>
 
 
-        <!-- Settings -->
+        <!-- ACTIVITY -->
+        <q-item
+            clickable
+            v-ripple
+        >
+          <q-item-section avatar>
+            <q-icon :name="matSchedule"/>
+          </q-item-section>
+
+          <q-item-section>
+            Activity
+          </q-item-section>
+        </q-item>
+
+
+        <!-- SETTINGS -->
         <q-item
             clickable
             v-ripple
             to="/settings"
         >
           <q-item-section avatar>
-            <q-icon name="settings"/>
+            <q-icon :name="matSettings"/>
           </q-item-section>
 
           <q-item-section>
             Settings
+          </q-item-section>
+        </q-item>
+
+
+        <!-- HELP -->
+        <q-item
+            clickable
+            v-ripple
+        >
+          <q-item-section avatar>
+            <q-icon :name="matHelpOutline"/>
+          </q-item-section>
+
+          <q-item-section>
+            Help
           </q-item-section>
         </q-item>
 
@@ -130,7 +186,7 @@ const leftDrawerOpen = ref(true)
     </q-drawer>
 
 
-    <!-- Page content -->
+    <!-- CONTENT -->
     <q-page-container>
       <router-view/>
     </q-page-container>
