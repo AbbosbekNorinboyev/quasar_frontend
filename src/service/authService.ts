@@ -13,6 +13,15 @@ export type AuthUser = {
   role?: string
 }
 
+type ApiUserResponse = {
+  data?: AuthUser | ApiUserResponse
+  result?: AuthUser | ApiUserResponse
+  payload?: AuthUser | ApiUserResponse
+  user?: AuthUser
+  success?: boolean
+  message?: string
+}
+
 export type RegisterRequest = {
   fullName: string
   phoneNumber: string
@@ -102,11 +111,35 @@ export const login = async (request: LoginRequest) => {
   return response
 }
 
+const extractUser = (data: AuthUser | ApiUserResponse): AuthUser => {
+  let payload: AuthUser | ApiUserResponse = data
+
+  for (let depth = 0; depth < 4; depth += 1) {
+    if ('user' in payload && payload.user) {
+      return payload.user
+    }
+
+    const nested = 'data' in payload
+      ? payload.data
+      : 'result' in payload
+        ? payload.result
+        : 'payload' in payload
+          ? payload.payload
+          : undefined
+
+    if (!nested) {
+      break
+    }
+
+    payload = nested
+  }
+
+  return payload as AuthUser
+}
+
 export const getMe = async (): Promise<AuthUser> => {
-  const response = await api.get<AuthUser | { data?: AuthUser }>('/users/me')
-  const user = 'data' in response.data && response.data.data
-    ? response.data.data
-    : response.data
+  const response = await api.get<AuthUser | ApiUserResponse>('/users/me')
+  const user = extractUser(response.data)
 
   authState.user = user
   localStorage.setItem(USER_KEY, JSON.stringify(user))
