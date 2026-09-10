@@ -9,16 +9,36 @@ import {
   matShield,
   matTrendingUp,
 } from '@quasar/extras/material-icons'
-
+import {getUsers} from '@/service/userService.ts'
 import {getRoles} from '@/service/roleService.ts'
 
 type User = {
-  name: string
+  id: number
+  fullName: string
+  phoneNumber: string
   email: string
-  role: string
-  status: 'Active' | 'Inactive'
-  initials: string
-  color: string
+  username: string
+  birthDate: string
+  status: string
+  createdAt: string
+  updatedAt: string
+}
+
+const users = ref<User[]>([])
+const usersLoading = ref(false)
+
+const loadUsers = async () => {
+  usersLoading.value = true
+
+  try {
+    const response = await getUsers()
+
+    users.value = response.data.data
+  } catch (error) {
+    console.error('Users yuklashda xatolik:', error)
+  } finally {
+    usersLoading.value = false
+  }
 }
 
 type Role = {
@@ -28,33 +48,6 @@ type Role = {
   createdAt: string
   updatedAt: string
 }
-
-const users: User[] = [
-  {
-    name: 'Ali Valiyev',
-    email: 'ali.valiyev@example.com',
-    role: 'Administrator',
-    status: 'Active',
-    initials: 'AV',
-    color: 'primary',
-  },
-  {
-    name: 'Husanboy Jorayev',
-    email: 'husanboy.jorayev@example.com',
-    role: 'Manager',
-    status: 'Active',
-    initials: 'HJ',
-    color: 'deep-purple',
-  },
-  {
-    name: 'Sardor Rahimov',
-    email: 'sardor.rahimov@example.com',
-    role: 'User',
-    status: 'Inactive',
-    initials: 'SR',
-    color: 'teal',
-  },
-]
 
 const roles = ref<Role[]>([])
 const rolesLoading = ref(false)
@@ -74,6 +67,7 @@ const loadRoles = async () => {
 }
 
 onMounted(() => {
+  loadUsers()
   loadRoles()
 })
 </script>
@@ -245,25 +239,42 @@ onMounted(() => {
 
             <q-separator/>
 
-            <q-list separator>
+            <!-- Loading -->
+            <div
+                v-if="usersLoading"
+                class="row justify-center q-pa-lg"
+            >
+              <q-spinner
+                  color="primary"
+                  size="30px"
+              />
+            </div>
+
+            <!-- Users -->
+            <q-list
+                v-else
+                separator
+            >
               <q-item
-                  v-for="user in users"
-                  :key="user.email"
+                  v-for="user in users.slice(0, 5)"
+                  :key="user.id"
                   class="q-py-md"
               >
 
+                <!-- Avatar -->
                 <q-item-section avatar>
                   <q-avatar
-                      :color="user.color"
+                      color="primary"
                       text-color="white"
                   >
-                    {{ user.initials }}
+                    {{ user.fullName?.charAt(0)?.toUpperCase() }}
                   </q-avatar>
                 </q-item-section>
 
+                <!-- User info -->
                 <q-item-section>
                   <q-item-label class="text-weight-medium">
-                    {{ user.name }}
+                    {{ user.fullName }}
                   </q-item-label>
 
                   <q-item-label caption>
@@ -271,19 +282,20 @@ onMounted(() => {
                   </q-item-label>
                 </q-item-section>
 
+                <!-- Status -->
                 <q-item-section side>
                   <q-chip
                       dense
                       :color="
-                      user.status === 'Active'
-                        ? 'green-1'
-                        : 'grey-3'
-                    "
+                user.status === 'ACTIVE'
+                  ? 'green-1'
+                  : 'grey-3'
+              "
                       :text-color="
-                      user.status === 'Active'
-                        ? 'positive'
-                        : 'grey-7'
-                    "
+                user.status === 'ACTIVE'
+                  ? 'positive'
+                  : 'grey-7'
+              "
                   >
                     {{ user.status }}
                   </q-chip>
@@ -291,6 +303,14 @@ onMounted(() => {
 
               </q-item>
             </q-list>
+
+            <!-- Empty -->
+            <div
+                v-if="!usersLoading && users.length === 0"
+                class="text-center text-grey-6 q-pa-lg"
+            >
+              No users found
+            </div>
 
           </q-card>
         </div>
