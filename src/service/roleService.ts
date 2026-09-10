@@ -10,6 +10,6 @@ export function createRole(data: any) {
     return api.post(`${API_URL}/create`, data)
 }
 
-export function updateRole(roleId: number, data: any) {
-    return api.post(`${API_URL}/update/${roleId}`, data)
+export function updateRole(roleId: number, data: { name: string; status: string }) {
+    return api.put(`${API_URL}/update/${roleId}`, data)
 }

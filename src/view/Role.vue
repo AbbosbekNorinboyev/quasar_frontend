@@ -40,6 +40,7 @@ const createLoading = ref(false)
 const updateLoading = ref(false)
 const createError = ref('')
 const updateError = ref('')
+const updateFormRef = ref()
 
 // Edit qilinayotgan role ID
 const editingId = ref<number | null>(null)
@@ -188,15 +189,26 @@ const handleUpdate = async () => {
   }
 
   updateError.value = ''
+
+  const isValid = await updateFormRef.value?.validate()
+  if (!isValid) {
+    return
+  }
+
   updateLoading.value = true
 
   try {
     const updateRequest = {
-      name: updateForm.value.name,
+      name: updateForm.value.name.trim(),
       status: updateForm.value.status
     }
 
-    await updateRole(editingId.value, updateRequest)
+    const response = await updateRole(editingId.value, updateRequest)
+
+    if (response.data?.success === false || response.data?.code === 400) {
+      updateError.value = response.data?.message || 'Roleni yangilashda xatolik yuz berdi'
+      return
+    }
 
     // Modalni yopamiz
     showUpdateModal.value = false
@@ -386,7 +398,7 @@ const handleUpdate = async () => {
     </q-dialog>
 
     <!-- Role yangilash -->
-    <q-dialog v-model="showUpdateModal">
+    <q-dialog v-model="showUpdateModal" persistent>
       <q-card style="min-width: 350px; max-width: 520px">
         <q-card-section>
           <div class="text-h6 text-weight-bold">
@@ -395,11 +407,13 @@ const handleUpdate = async () => {
         </q-card-section>
 
         <q-card-section>
+          <q-form ref="updateFormRef" @submit.prevent="handleUpdate">
           <q-input
               v-model="updateForm.name"
               outlined
               label="Role nomi"
               class="q-mb-md"
+              :rules="[(value) => !!value?.trim() || 'Role nomini kiriting']"
           />
 
           <q-select
@@ -407,6 +421,7 @@ const handleUpdate = async () => {
               outlined
               label="Status"
               :options="statusOptions"
+              :rules="[(value) => !!value || 'Statusni tanlang']"
           />
 
           <div
@@ -415,6 +430,7 @@ const handleUpdate = async () => {
           >
             {{ updateError }}
           </div>
+          </q-form>
         </q-card-section>
 
         <q-card-actions align="right">
