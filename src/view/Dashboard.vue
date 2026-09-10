@@ -26,6 +26,7 @@ type User = {
 
 const users = ref<User[]>([])
 const usersLoading = ref(false)
+const totalUsers = ref(0)
 
 const getUserInitials = (fullName?: string): string => {
   const parts = fullName?.trim().split(/\s+/).filter(Boolean) ?? []
@@ -49,6 +50,7 @@ const loadUsers = async () => {
     const response = await getUsers()
 
     users.value = response.data.data
+    totalUsers.value = response.data.elements
   } catch (error) {
     console.error('Users yuklashda xatolik:', error)
   } finally {
@@ -66,6 +68,7 @@ type Role = {
 
 const roles = ref<Role[]>([])
 const rolesLoading = ref(false)
+const totalRoles = ref(0)
 
 const loadRoles = async () => {
   rolesLoading.value = true
@@ -74,6 +77,7 @@ const loadRoles = async () => {
     const response = await getRoles()
 
     roles.value = response.data.data
+    totalRoles.value = response.data.elements
   } catch (error) {
     console.error('Roles yuklashda xatolik:', error)
   } finally {
@@ -116,7 +120,7 @@ onMounted(() => {
                   </div>
 
                   <div class="text-h4 text-weight-bold q-mt-sm">
-                    102
+                    {{ totalUsers }}
                   </div>
 
                   <div class="text-caption text-positive q-mt-sm">
@@ -176,7 +180,7 @@ onMounted(() => {
                   </div>
 
                   <div class="text-h4 text-weight-bold q-mt-sm">
-                    8
+                    {{ totalRoles }}
                   </div>
 
                   <div class="text-caption text-grey-6 q-mt-sm">
