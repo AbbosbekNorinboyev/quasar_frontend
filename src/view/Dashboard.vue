@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {
   matBadge,
   matHowToReg,
@@ -27,6 +27,15 @@ type User = {
 const users = ref<User[]>([])
 const usersLoading = ref(false)
 const totalUsers = ref(0)
+const activeUsers = computed(() =>
+  users.value.filter((user) => user.status?.toUpperCase() === 'ACTIVE').length
+)
+const pendingInvites = computed(() =>
+  users.value.filter((user) => {
+    const status = user.status?.toUpperCase()
+    return status === 'PENDING'
+  }).length
+)
 
 const getUserInitials = (fullName?: string): string => {
   const parts = fullName?.trim().split(/\s+/).filter(Boolean) ?? []
@@ -150,7 +159,7 @@ onMounted(() => {
                   </div>
 
                   <div class="text-h4 text-weight-bold q-mt-sm">
-                    98
+                    {{ activeUsers }}
                   </div>
 
                   <div class="text-caption text-positive q-mt-sm">
@@ -209,7 +218,7 @@ onMounted(() => {
                   </div>
 
                   <div class="text-h4 text-weight-bold q-mt-sm">
-                    6
+                    {{ pendingInvites }}
                   </div>
 
                   <div class="text-caption text-warning q-mt-sm">
