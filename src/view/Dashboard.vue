@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {onMounted, ref} from 'vue'
 import {
   matBadge,
   matHowToReg,
@@ -8,6 +9,8 @@ import {
   matShield,
   matTrendingUp,
 } from '@quasar/extras/material-icons'
+
+import {getRoles} from '@/service/roleService.ts'
 
 type User = {
   name: string
@@ -19,10 +22,11 @@ type User = {
 }
 
 type Role = {
+  id: number
   name: string
-  description: string
-  users: number
-  color: string
+  status: string
+  createdAt: string
+  updatedAt: string
 }
 
 const users: User[] = [
@@ -52,26 +56,26 @@ const users: User[] = [
   },
 ]
 
-const roles: Role[] = [
-  {
-    name: 'Administrator',
-    description: 'Full access to all system resources',
-    users: 4,
-    color: 'primary',
-  },
-  {
-    name: 'Manager',
-    description: 'Manage users and operational data',
-    users: 12,
-    color: 'deep-purple',
-  },
-  {
-    name: 'User',
-    description: 'Access assigned features and resources',
-    users: 86,
-    color: 'teal',
-  },
-]
+const roles = ref<Role[]>([])
+const rolesLoading = ref(false)
+
+const loadRoles = async () => {
+  rolesLoading.value = true
+
+  try {
+    const response = await getRoles()
+
+    roles.value = response.data.data
+  } catch (error) {
+    console.error('Roles yuklashda xatolik:', error)
+  } finally {
+    rolesLoading.value = false
+  }
+}
+
+onMounted(() => {
+  loadRoles()
+})
 </script>
 
 <template>
@@ -316,17 +320,20 @@ const roles: Role[] = [
 
             <q-separator/>
 
-            <q-list separator>
+            <q-list
+                v-if="!rolesLoading"
+                separator
+            >
               <q-item
                   v-for="role in roles"
-                  :key="role.name"
+                  :key="role.id"
                   class="q-py-md"
               >
 
                 <q-item-section avatar>
                   <q-avatar
-                      :color="`${role.color}-1`"
-                      :text-color="role.color"
+                      color="purple-1"
+                      text-color="deep-purple"
                       :icon="matShield"
                   />
                 </q-item-section>
@@ -337,19 +344,26 @@ const roles: Role[] = [
                   </q-item-label>
 
                   <q-item-label caption>
-                    {{ role.description }}
+                    {{ role.status }}
                   </q-item-label>
                 </q-item-section>
 
-                <q-item-section
-                    side
-                    class="text-weight-bold"
-                >
-                  {{ role.users }}
+                <q-item-section side>
+                  <q-badge
+                      :color="role.status === 'ACTIVE' ? 'positive' : 'negative'"
+                      :label="role.status"
+                  />
                 </q-item-section>
 
               </q-item>
             </q-list>
+
+            <q-card-section v-else class="text-center">
+              <q-spinner
+                  color="primary"
+                  size="30px"
+              />
+            </q-card-section>
 
           </q-card>
         </div>
