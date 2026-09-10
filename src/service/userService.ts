@@ -31,6 +31,10 @@ export function getUsers(
     return api.get(`${API_URL}/getAll`)
 }
 
+export function createUser(data: any) {
+    return api.post(`${API_URL}/create`, data)
+}
+
 export const getUser = async (id: number | string): Promise<User> => {
     const response = await api.get<User>(`/users/${id}`)
     return response.data

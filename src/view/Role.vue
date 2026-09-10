@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {onMounted, ref} from 'vue'
-import {getRoles} from '@/service/roleService.ts'
+import {getRoles, createRole} from '@/service/roleService.ts'
 import {
   matAdd,
   matEdit,
@@ -21,6 +21,28 @@ type Role = {
 const roles = ref<Role[]>([])
 const loading = ref(false)
 const search = ref('')
+
+// Create uchun form
+const createForm = ref({
+  name: ''
+})
+
+const showCreateModal = ref(false)
+const createLoading = ref(false)
+const createError = ref('')
+
+// =========================
+// OPEN MODAL
+// =========================
+const openCreateModal = () => {
+
+  createForm.value = {
+    name: '',
+  }
+
+  createError.value = ''
+  showCreateModal.value = true
+}
 
 const columns = [
   {
@@ -79,6 +101,47 @@ const loadRoles = async () => {
     loading.value = false
   }
 }
+// =========================
+// CREATE ROLE
+// =========================
+
+const handleCreate = async () => {
+  createError.value = ''
+  createLoading.value = true
+
+  try {
+
+    const request = {
+      name: createForm.value.name,
+    }
+
+    console.log('Create request:', request)
+
+    await createRole(request)
+
+    // Modalni yopish
+    showCreateModal.value = false
+
+    // Formani tozalash
+    createForm.value = {
+      name: '',
+    }
+
+    // Jadvalni qayta yuklash
+    await loadRoles()
+
+  } catch (e: any) {
+
+    console.error('Create district error:', e)
+
+    createError.value =
+        e?.response?.data?.message ||
+        'Role yaratishda xatolik yuz berdi'
+
+  } finally {
+    createLoading.value = false
+  }
+}
 
 onMounted(() => {
   loadRoles()
@@ -105,6 +168,7 @@ onMounted(() => {
           color="primary"
           :icon="matAdd"
           label="Add Role"
+          @click="openCreateModal"
       />
 
     </div>
@@ -224,6 +288,26 @@ onMounted(() => {
       </q-table>
 
     </q-card>
+
+    <!--    Role yaratish -->
+    <q-dialog v-model="showCreateModal">
+      <q-card style="min-width: 350px; max-width: 520px;">
+        <q-card-section>
+          <div class="text-h6 text-weight-bold">Yangi role yaratish</div>
+        </q-card-section>
+
+        <q-card-section>
+          <q-input v-model="createForm.name" outlined label="Role nomi"/>
+
+          <div v-if="createError" class="text-negative q-mt-sm">{{ createError }}</div>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Bekor qilish" @click="showCreateModal = false"/>
+          <q-btn color="primary" label="Yaratish" :loading="createLoading" @click="handleCreate"/>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
 
   </q-page>
 </template>
