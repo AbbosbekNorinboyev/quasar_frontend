@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import {onMounted, ref} from 'vue'
 import {getUsers} from '@/service/userService.ts'
-import {
-  matAdd,
-  matEdit,
-  matDelete,
-  matRefresh,
-  matSearch
-} from '@quasar/extras/material-icons'
+import {matAdd, matDelete, matEdit, matRefresh, matSearch} from '@quasar/extras/material-icons'
 import {formatDate} from '@/utils/date.ts';
 
 type User = {

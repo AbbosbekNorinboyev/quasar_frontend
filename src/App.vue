@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import {onMounted, ref, watch} from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {
   matAdminPanelSettings,
   matDashboard,
-  matHelpOutline,
   matMenu,
   matNotificationsNone,
   matPeople,
-  matSchedule,
   matSettings,
 } from '@quasar/extras/material-icons'
 import {authState, getMe, isAuthenticated, logout} from '@/service/authService'
@@ -36,6 +34,28 @@ const loadCurrentUser = async () => {
 
 onMounted(loadCurrentUser)
 watch(() => route.meta.public, loadCurrentUser)
+
+const userInitials = computed(() => {
+  const fullName =
+    authState.user?.fullName ||
+    authState.user?.name ||
+    ''
+
+  const parts = fullName.trim().split(/\s+/)
+
+  if (!fullName.trim()) {
+    return 'U'
+  }
+
+  const firstName = parts[0]?.charAt(0) ?? ''
+
+  const lastName =
+    parts.length > 1
+      ? parts[parts.length - 1]?.charAt(0) ?? ''
+      : ''
+
+  return `${firstName}${lastName}`.toUpperCase()
+})
 </script>
 
 <template>
@@ -105,7 +125,7 @@ watch(() => route.meta.public, loadCurrentUser)
 
           <q-item-section avatar>
             <q-avatar color="primary" text-color="white">
-              A
+              {{ userInitials }}
             </q-avatar>
           </q-item-section>
 
