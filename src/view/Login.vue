@@ -14,6 +14,12 @@ const showPassword = ref(false)
 
 const submit = async () => {
   errorMessage.value = ''
+
+  if (!username.value.trim() || !password.value) {
+    errorMessage.value = 'Username va parolni kiriting.'
+    return
+  }
+
   loading.value = true
 
   try {

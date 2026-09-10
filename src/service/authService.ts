@@ -28,6 +28,9 @@ export type LoginRequest = {
 }
 
 type AuthPayload = {
+  code?: number | string
+  success?: boolean
+  status?: string
   accessToken?: string
   access_token?: string
   token?: string
@@ -64,6 +67,11 @@ const extractPayload = (data: AuthPayload): AuthPayload => {
 
 const saveSession = (data: AuthPayload): void => {
   const payload = extractPayload(data)
+
+  if (payload.success === false || String(payload.code) === '401') {
+    throw new Error(payload.message || 'Username yoki parol noto‘g‘ri.')
+  }
+
   const token = payload.accessToken
     ?? payload.access_token
     ?? payload.token
@@ -92,6 +100,17 @@ export const login = async (request: LoginRequest) => {
   const response = await api.post<AuthPayload>('/users/login', request)
   saveSession(response.data)
   return response
+}
+
+export const getMe = async (): Promise<AuthUser> => {
+  const response = await api.get<AuthUser | { data?: AuthUser }>('/users/me')
+  const user = 'data' in response.data && response.data.data
+    ? response.data.data
+    : response.data
+
+  authState.user = user
+  localStorage.setItem(USER_KEY, JSON.stringify(user))
+  return user
 }
 
 export const logout = (): void => {

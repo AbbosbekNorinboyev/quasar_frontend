@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {ref} from 'vue'
+import {onMounted, ref, watch} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {
   matAdminPanelSettings,
@@ -11,7 +11,7 @@ import {
   matSchedule,
   matSettings,
 } from '@quasar/extras/material-icons'
-import {logout} from '@/service/authService'
+import {authState, getMe, isAuthenticated, logout} from '@/service/authService'
 
 const leftDrawerOpen = ref(true)
 const route = useRoute()
@@ -21,6 +21,21 @@ const signOut = async () => {
   logout()
   await router.replace('/login')
 }
+
+const loadCurrentUser = async () => {
+  if (route.meta.public || !isAuthenticated()) {
+    return
+  }
+
+  try {
+    await getMe()
+  } catch (error) {
+    console.error('Foydalanuvchi maʼlumotlarini yuklashda xatolik:', error)
+  }
+}
+
+onMounted(loadCurrentUser)
+watch(() => route.meta.public, loadCurrentUser)
 </script>
 
 <template>
@@ -96,11 +111,11 @@ const signOut = async () => {
 
           <q-item-section>
             <q-item-label class="text-weight-bold">
-              Admin Panel
+              {{ authState.user?.fullName || authState.user?.name || 'Foydalanuvchi' }}
             </q-item-label>
 
             <q-item-label caption>
-              Management
+              {{ authState.user?.role || 'User' }}
             </q-item-label>
           </q-item-section>
 
