@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import {onMounted, ref} from 'vue'
-import {getUsers, createUser} from '@/service/userService.ts'
+import {getUsers, createUser, updateUser} from '@/service/userService.ts'
 import {getRoles} from '@/service/roleService.ts'
 import {matAdd, matDelete, matEdit, matRefresh, matSearch} from '@quasar/extras/material-icons'
 import {formatDate} from '@/utils/date.ts';
+import {type Status, statusOptions} from "@/types/Status.ts";
 
 type User = {
   id: number
@@ -12,7 +13,7 @@ type User = {
   email: string
   username: string
   birthDate: string
-  status: string
+  status: Status
   createdAt: string
   updatedAt: string
 }
@@ -29,11 +30,19 @@ const loading = ref(false)
 const search = ref('')
 
 const showCreateModal = ref(false)
+const showUpdateModal = ref(false)
 const createLoading = ref(false)
+const updateLoading = ref(false)
 const createError = ref('')
+const updateError = ref('')
 const showPassword = ref(false)
 const createFormRef = ref()
+const updateFormRef = ref()
 
+// Edit qilinayotgan role ID
+const editingId = ref<number | null>(null)
+
+// Create uchun form
 const createForm = ref({
   fullName: '',
   phoneNumber: '',
@@ -44,6 +53,20 @@ const createForm = ref({
   roleIds: [] as number[],
 })
 
+// Update uchun form
+const updateForm = ref({
+  fullName: '',
+  phoneNumber: '',
+  email: '',
+  username: '',
+  password: '',
+  birthDate: '',
+  status: '',
+})
+
+// =========================
+// OPEN CREATE MODAL
+// =========================
 const openCreateModal = () => {
   createForm.value = {
     fullName: '',
@@ -57,6 +80,28 @@ const openCreateModal = () => {
   createError.value = ''
   showPassword.value = false
   showCreateModal.value = true
+}
+
+// =========================
+// OPEN UPDATE MODAL
+// =========================
+const openUpdateModal = (user: any) => {
+  // Qaysi role edit qilinayotganini saqlaymiz
+  editingId.value = user.id
+
+  // Role ma'lumotlarini update formga joylaymiz
+  updateForm.value = {
+    fullName: user.fullName ?? '',
+    phoneNumber: user.phoneNumber ?? '',
+    email: user.email ?? '',
+    username: user.username ?? '',
+    password: '',
+    birthDate: user.birthDate ?? '',
+    status: user.status ?? 'ACTIVE'
+  }
+
+  updateError.value = ''
+  showUpdateModal.value = true
 }
 
 const columns = [
@@ -154,6 +199,11 @@ const loadRoles = async () => {
   }
 }
 
+onMounted(() => {
+  loadUsers()
+  loadRoles()
+})
+
 const handleCreate = async () => {
   createError.value = ''
 
@@ -190,10 +240,66 @@ const handleCreate = async () => {
   }
 }
 
-onMounted(() => {
-  loadUsers()
-  loadRoles()
-})
+const handleUpdate = async () => {
+
+  // ID bo'lmasa update qilmaymiz
+  if (editingId.value === null) {
+    return
+  }
+
+  updateError.value = ''
+
+  const isValid = await updateFormRef.value?.validate()
+  if (isValid === false) {
+    return
+  }
+
+  updateLoading.value = true
+
+  try {
+    const updateRequest: {
+      fullName: string
+      phoneNumber: string
+      email: string
+      username: string
+      birthDate: string
+      status: string
+      password?: string
+    } = {
+      fullName: updateForm.value.fullName.trim(),
+      phoneNumber: updateForm.value.phoneNumber.trim(),
+      email: updateForm.value.email.trim(),
+      username: updateForm.value.username.trim(),
+      birthDate: updateForm.value.birthDate,
+      status: updateForm.value.status,
+    }
+
+    if (updateForm.value.password.trim()) {
+      updateRequest.password = updateForm.value.password
+    }
+
+    const response = await updateUser(editingId.value, updateRequest)
+
+    if (response.data?.success === false || response.data?.code === 400) {
+      updateError.value = response.data?.message ?? 'Userni yangilashda xatolik yuz berdi'
+      return
+    }
+
+    // Modalni yopamiz
+    showUpdateModal.value = false
+    editingId.value = null
+
+    await loadUsers()
+  } catch (e: any) {
+    console.error('Error updating user:', e)
+
+    updateError.value =
+        e?.response?.data?.message ||
+        'Userni yangilashda xatolik yuz berdi'
+  } finally {
+    updateLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -312,6 +418,7 @@ onMounted(() => {
                 dense
                 :icon="matEdit"
                 color="primary"
+                @click="openUpdateModal(props.row)"
             >
               <q-tooltip>
                 Edit
@@ -338,7 +445,7 @@ onMounted(() => {
 
     </q-card>
 
-    <!--  User yaratish -->
+    <!--  User yaratish  -->
     <q-dialog v-model="showCreateModal" persistent>
       <q-card class="create-user-card">
         <q-card-section>
@@ -445,6 +552,88 @@ onMounted(() => {
             </q-card-actions>
           </q-form>
         </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!--  User yangilash -->
+    <q-dialog v-model="showUpdateModal" persistent>
+      <q-card style="min-width: 350px; max-width: 520px">
+        <q-card-section>
+          <div class="text-h6 text-weight-bold">
+            User ni tahrirlash
+          </div>
+        </q-card-section>
+
+        <q-card-section>
+          <q-form ref="updateFormRef" class="q-gutter-sm" @submit.prevent="handleUpdate">
+          <q-input
+              outlined
+              label="Ism familiya"
+              v-model="updateForm.fullName"
+              :rules="[(value) => !!value?.trim() || 'Ism familiya kiriting']"
+          />
+
+          <q-input
+              outlined
+              label="Telefon raqami"
+              v-model="updateForm.phoneNumber"
+              :rules="[(value) => !!value?.trim() || 'Telefon raqamini kiriting']"
+          />
+
+          <q-input
+              outlined
+              label="Email"
+              v-model="updateForm.email"
+              :rules="[(value) => !!value?.trim() || 'Email kiriting']"
+          />
+
+          <q-input
+              outlined
+              label="Username"
+              v-model="updateForm.username"
+              :rules="[(value) => !!value?.trim() || 'Username kiriting']"
+          />
+
+          <q-input
+              outlined
+              label="Tugilgan sanasi"
+              v-model="updateForm.birthDate"
+              type="date"
+          />
+
+          <q-select
+              v-model="updateForm.status"
+              outlined
+              label="Status"
+              :options="statusOptions"
+              :rules="[(value) => !!value || 'Statusni tanlang']"
+          />
+
+          <div
+              v-if="updateError"
+              class="text-negative q-mt-sm"
+          >
+            {{ updateError }}
+          </div>
+          </q-form>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn
+              flat
+              color="negative"
+              label="Bekor qilish"
+              @click="showUpdateModal = false"
+          />
+
+          <q-btn
+              color="primary"
+              label="Saqlash"
+              type="submit"
+              :loading="updateLoading"
+              @click="handleUpdate"
+          />
+        </q-card-actions>
       </q-card>
     </q-dialog>
 

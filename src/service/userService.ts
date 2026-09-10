@@ -39,3 +39,15 @@ export const getUser = async (id: number | string): Promise<User> => {
     const response = await api.get<User>(`/users/${id}`)
     return response.data
 }
+
+export function updateUser(userId: number, data: {
+    fullName: string
+    phoneNumber: string
+    email: string
+    username: string
+    birthDate: string
+    status: string
+    password?: string
+}) {
+    return api.put(`${API_URL}/update/${userId}`, data)
+}
