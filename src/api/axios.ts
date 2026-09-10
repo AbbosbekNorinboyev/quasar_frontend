@@ -23,7 +23,7 @@ api.interceptors.request.use((config) => {
   const token = getAccessToken()
 
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+    config.headers.Authorization = ['Bearer', token].join(' ')
   }
 
   return config

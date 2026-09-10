@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 import {
   matAdminPanelSettings,
   matDashboard,
@@ -10,12 +11,26 @@ import {
   matSchedule,
   matSettings,
 } from '@quasar/extras/material-icons'
+import {logout} from '@/service/authService'
 
 const leftDrawerOpen = ref(true)
+const route = useRoute()
+const router = useRouter()
+
+const signOut = async () => {
+  logout()
+  await router.replace('/login')
+}
 </script>
 
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout v-if="route.meta.public" view="lHh Lpr lFf">
+    <q-page-container>
+      <router-view/>
+    </q-page-container>
+  </q-layout>
+
+  <q-layout v-else view="lHh Lpr lFf">
 
     <!-- HEADER -->
     <q-header elevated class="bg-white text-dark">
@@ -46,6 +61,15 @@ const leftDrawerOpen = ref(true)
             :icon="matSettings"
             to="/settings"
         />
+
+        <q-btn
+            flat
+            round
+            icon="logout"
+            @click="signOut"
+        >
+          <q-tooltip>Chiqish</q-tooltip>
+        </q-btn>
 
       </q-toolbar>
     </q-header>
