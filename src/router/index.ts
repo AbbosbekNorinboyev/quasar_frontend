@@ -14,7 +14,8 @@ const routes = [
     },
     {
         path: '/login',
-        component: Login
+        component: Login,
+        meta: {public: true}
     },
     {
         path: '/register',
