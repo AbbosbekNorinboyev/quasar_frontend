@@ -30,6 +30,46 @@ const totalUsers = ref(0)
 const activeUsers = computed(() =>
   users.value.filter((user) => user.status?.toUpperCase() === 'ACTIVE').length
 )
+
+const activeUsersPercentage = computed(() => {
+  if (totalUsers.value === 0) {
+    return 0
+  }
+
+  return Math.round((activeUsers.value / totalUsers.value) * 100)
+})
+
+const usersThisMonth = computed(() => {
+  const now = new Date()
+
+  return users.value.filter((user) => {
+    const createdAt = new Date(user.createdAt)
+    return createdAt.getFullYear() === now.getFullYear()
+      && createdAt.getMonth() === now.getMonth()
+  }).length
+})
+
+const usersLastMonth = computed(() => {
+  const now = new Date()
+  const previousMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+
+  return users.value.filter((user) => {
+    const createdAt = new Date(user.createdAt)
+    return createdAt.getFullYear() === previousMonth.getFullYear()
+      && createdAt.getMonth() === previousMonth.getMonth()
+  }).length
+})
+
+const usersGrowthPercentage = computed(() => {
+  if (usersLastMonth.value === 0) {
+    return usersThisMonth.value > 0 ? 100 : 0
+  }
+
+  return Math.round(
+    ((usersThisMonth.value - usersLastMonth.value) / usersLastMonth.value) * 100,
+  )
+})
+
 const pendingInvites = computed(() =>
   users.value.filter((user) => {
     const status = user.status?.toUpperCase()
@@ -59,7 +99,7 @@ const loadUsers = async () => {
     const response = await getUsers()
 
     users.value = response.data.data
-    totalUsers.value = response.data.elements
+    totalUsers.value = response.data.elements ?? users.value.length
   } catch (error) {
     console.error('Users yuklashda xatolik:', error)
   } finally {
@@ -132,9 +172,12 @@ onMounted(() => {
                     {{ totalUsers }}
                   </div>
 
-                  <div class="text-caption text-positive q-mt-sm">
+                  <div
+                    class="text-caption q-mt-sm"
+                    :class="usersGrowthPercentage >= 0 ? 'text-positive' : 'text-negative'"
+                  >
                     <q-icon :name="matTrendingUp"/>
-                    12% this month
+                    {{ usersGrowthPercentage >= 0 ? '+' : '' }}{{ usersGrowthPercentage }}% vs last month
                   </div>
                 </div>
 
@@ -164,7 +207,7 @@ onMounted(() => {
 
                   <div class="text-caption text-positive q-mt-sm">
                     <q-icon :name="matTrendingUp"/>
-                    8% this month
+                    {{ activeUsersPercentage }}% of total users
                   </div>
                 </div>
 
