@@ -27,6 +27,21 @@ type User = {
 const users = ref<User[]>([])
 const usersLoading = ref(false)
 
+const getUserInitials = (fullName?: string): string => {
+  const parts = fullName?.trim().split(/\s+/).filter(Boolean) ?? []
+
+  if (parts.length === 0) {
+    return 'U'
+  }
+
+  const firstInitial = parts[0]?.charAt(0) ?? ''
+  const lastInitial = parts.length > 1
+    ? parts[parts.length - 1]?.charAt(0) ?? ''
+    : ''
+
+  return `${firstInitial}${lastInitial}`.toUpperCase()
+}
+
 const loadUsers = async () => {
   usersLoading.value = true
 
@@ -234,6 +249,7 @@ onMounted(() => {
                   color="primary"
                   label="View all"
                   no-caps
+                  to="/users"
               />
             </q-card-section>
 
@@ -267,7 +283,7 @@ onMounted(() => {
                       color="primary"
                       text-color="white"
                   >
-                    {{ user.fullName?.charAt(0)?.toUpperCase() }}
+                    {{ getUserInitials(user.fullName) }}
                   </q-avatar>
                 </q-item-section>
 
@@ -335,6 +351,7 @@ onMounted(() => {
                   color="primary"
                   label="Manage"
                   no-caps
+                  to="/roles"
               />
             </q-card-section>
 
