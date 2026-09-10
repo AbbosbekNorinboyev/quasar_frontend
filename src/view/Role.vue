@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {onMounted, ref} from 'vue'
-import {getRoles, createRole} from '@/service/roleService.ts'
+import {getRoles, createRole, updateRole} from '@/service/roleService.ts'
 import {
   matAdd,
   matEdit,
@@ -9,11 +9,12 @@ import {
   matSearch
 } from '@quasar/extras/material-icons'
 import {formatDate} from '@/utils/date.ts';
+import {type Status, statusOptions} from '@/types/Status'
 
 type Role = {
   id: number
   name: string
-  status: string
+  status: Status
   createdAt: string
   updatedAt: string
 }
@@ -27,12 +28,24 @@ const createForm = ref({
   name: ''
 })
 
+// Update uchun form
+const updateForm = ref({
+  name: '',
+  status: ''
+})
+
 const showCreateModal = ref(false)
+const showUpdateModal = ref(false)
 const createLoading = ref(false)
+const updateLoading = ref(false)
 const createError = ref('')
+const updateError = ref('')
+
+// Edit qilinayotgan role ID
+const editingId = ref<number | null>(null)
 
 // =========================
-// OPEN MODAL
+// OPEN CREATE MODAL
 // =========================
 const openCreateModal = () => {
 
@@ -42,6 +55,23 @@ const openCreateModal = () => {
 
   createError.value = ''
   showCreateModal.value = true
+}
+
+// =========================
+// OPEN UPDATE MODAL
+// =========================
+const openUpdateModal = (role: any) => {
+  // Qaysi role edit qilinayotganini saqlaymiz
+  editingId.value = role.id
+
+  // Role ma'lumotlarini update formga joylaymiz
+  updateForm.value = {
+    name: role.name,
+    status: role.status
+  }
+
+  updateError.value = ''
+  showUpdateModal.value = true
 }
 
 const columns = [
@@ -101,10 +131,14 @@ const loadRoles = async () => {
     loading.value = false
   }
 }
+
+onMounted(() => {
+  loadRoles()
+})
+
 // =========================
 // CREATE ROLE
 // =========================
-
 const handleCreate = async () => {
   createError.value = ''
   createLoading.value = true
@@ -143,9 +177,42 @@ const handleCreate = async () => {
   }
 }
 
-onMounted(() => {
-  loadRoles()
-})
+// =========================
+// UPDATE ROLE
+// =========================
+const handleUpdate = async () => {
+
+  // ID bo'lmasa update qilmaymiz
+  if (editingId.value === null) {
+    return
+  }
+
+  updateError.value = ''
+  updateLoading.value = true
+
+  try {
+    const updateRequest = {
+      name: updateForm.value.name,
+      status: updateForm.value.status
+    }
+
+    await updateRole(editingId.value, updateRequest)
+
+    // Modalni yopamiz
+    showUpdateModal.value = false
+    editingId.value = null
+
+    await loadRoles()
+  } catch (e: any) {
+    console.error('Error updating role:', e)
+
+    updateError.value =
+        e?.response?.data?.message ||
+        'Roleni yangilashda xatolik yuz berdi'
+  } finally {
+    updateLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -263,6 +330,7 @@ onMounted(() => {
                 dense
                 :icon="matEdit"
                 color="primary"
+                @click="openUpdateModal(props.row)"
             >
               <q-tooltip>
                 Edit
@@ -289,7 +357,7 @@ onMounted(() => {
 
     </q-card>
 
-    <!--    Role yaratish -->
+    <!-- Role yaratish -->
     <q-dialog v-model="showCreateModal">
       <q-card style="min-width: 350px; max-width: 520px;">
         <q-card-section>
@@ -313,6 +381,56 @@ onMounted(() => {
               label="Yaratish"
               :loading="createLoading"
               @click="handleCreate"/>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <!-- Role yangilash -->
+    <q-dialog v-model="showUpdateModal">
+      <q-card style="min-width: 350px; max-width: 520px">
+        <q-card-section>
+          <div class="text-h6 text-weight-bold">
+            Role ni tahrirlash
+          </div>
+        </q-card-section>
+
+        <q-card-section>
+          <q-input
+              v-model="updateForm.name"
+              outlined
+              label="Role nomi"
+              class="q-mb-md"
+          />
+
+          <q-select
+              v-model="updateForm.status"
+              outlined
+              label="Status"
+              :options="statusOptions"
+          />
+
+          <div
+              v-if="updateError"
+              class="text-negative q-mt-sm"
+          >
+            {{ updateError }}
+          </div>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn
+              flat
+              color="negative"
+              label="Bekor qilish"
+              @click="showUpdateModal = false"
+          />
+
+          <q-btn
+              color="primary"
+              label="Saqlash"
+              :loading="updateLoading"
+              @click="handleUpdate"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>

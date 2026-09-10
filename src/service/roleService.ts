@@ -9,3 +9,7 @@ export function getRoles() {
 export function createRole(data: any) {
     return api.post(`${API_URL}/create`, data)
 }
+
+export function updateRole(roleId: number, data: any) {
+    return api.post(`${API_URL}/update/${roleId}`, data)
+}
