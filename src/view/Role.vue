@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { getRoles } from '@/service/roleService.ts'
+import {onMounted, ref} from 'vue'
+import {getRoles} from '@/service/roleService.ts'
 import {
   matAdd,
   matEdit,
@@ -121,7 +121,7 @@ onMounted(() => {
           class="col-12 col-sm-4"
       >
         <template #prepend>
-          <q-icon :name="matSearch" />
+          <q-icon :name="matSearch"/>
         </template>
       </q-input>
 
