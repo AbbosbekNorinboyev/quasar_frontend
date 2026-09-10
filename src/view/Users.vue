@@ -8,6 +8,7 @@ import {
   matRefresh,
   matSearch
 } from '@quasar/extras/material-icons'
+import {formatDate} from '@/utils/date.ts';
 
 type User = {
   id: number
@@ -204,7 +205,7 @@ onMounted(() => {
         <template #body-cell-createdAt="props">
 
           <q-td :props="props">
-            {{ new Date(props.value).toLocaleString() }}
+            {{ formatDate(props.value) }}
           </q-td>
 
         </template>
@@ -214,7 +215,7 @@ onMounted(() => {
         <template #body-cell-updatedAt="props">
 
           <q-td :props="props">
-            {{ new Date(props.value).toLocaleString() }}
+            {{ formatDate(props.value) }}
           </q-td>
 
         </template>
