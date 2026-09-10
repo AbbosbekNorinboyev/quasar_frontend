@@ -431,7 +431,11 @@ onMounted(() => {
             </q-banner>
 
             <q-card-actions align="right" class="q-px-none">
-              <q-btn flat label="Bekor qilish" @click="showCreateModal = false"/>
+              <q-btn
+                  flat
+                  color="negative"
+                  label="Bekor qilish"
+                  @click="showCreateModal = false"/>
               <q-btn
                   color="primary"
                   label="Yaratish"

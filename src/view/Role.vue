@@ -303,8 +303,16 @@ onMounted(() => {
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Bekor qilish" @click="showCreateModal = false"/>
-          <q-btn color="primary" label="Yaratish" :loading="createLoading" @click="handleCreate"/>
+          <q-btn
+              flat
+              color="negative"
+              label="Bekor qilish"
+              @click="showCreateModal = false"/>
+          <q-btn
+              color="primary"
+              label="Yaratish"
+              :loading="createLoading"
+              @click="handleCreate"/>
         </q-card-actions>
       </q-card>
     </q-dialog>
