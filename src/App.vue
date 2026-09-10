@@ -133,57 +133,6 @@ const leftDrawerOpen = ref(true)
           </q-item-section>
         </q-item>
 
-
-        <q-separator class="q-my-md"/>
-
-
-        <!-- ACTIVITY -->
-        <q-item
-            clickable
-            v-ripple
-            to="/activity"
-        >
-          <q-item-section avatar>
-            <q-icon :name="matSchedule"/>
-          </q-item-section>
-
-          <q-item-section>
-            Activity
-          </q-item-section>
-        </q-item>
-
-
-        <!-- SETTINGS -->
-        <q-item
-            clickable
-            v-ripple
-            to="/settings"
-        >
-          <q-item-section avatar>
-            <q-icon :name="matSettings"/>
-          </q-item-section>
-
-          <q-item-section>
-            Settings
-          </q-item-section>
-        </q-item>
-
-
-        <!-- HELP -->
-        <q-item
-            clickable
-            v-ripple
-            to="/help"
-        >
-          <q-item-section avatar>
-            <q-icon :name="matHelpOutline"/>
-          </q-item-section>
-
-          <q-item-section>
-            Help
-          </q-item-section>
-        </q-item>
-
       </q-list>
 
     </q-drawer>
