@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {onMounted, ref} from 'vue'
-import {getRoles, createRole, updateRole} from '@/service/roleService.ts'
+import {getRoles, createRole, updateRole, deleteRole} from '@/service/roleService.ts'
 import {
   matAdd,
   matEdit,
@@ -41,6 +41,10 @@ const updateLoading = ref(false)
 const createError = ref('')
 const updateError = ref('')
 const updateFormRef = ref()
+const showDeleteModal = ref(false)
+const deleteLoading = ref(false)
+const deleteError = ref('')
+const deletingRole = ref<Role | null>(null)
 
 // Edit qilinayotgan role ID
 const editingId = ref<number | null>(null)
@@ -73,6 +77,39 @@ const openUpdateModal = (role: any) => {
 
   updateError.value = ''
   showUpdateModal.value = true
+}
+
+const openDeleteModal = (role: Role) => {
+  deletingRole.value = role
+  deleteError.value = ''
+  showDeleteModal.value = true
+}
+
+const handleDelete = async () => {
+  if (!deletingRole.value) {
+    return
+  }
+
+  deleteError.value = ''
+  deleteLoading.value = true
+
+  try {
+    const response = await deleteRole(deletingRole.value.id)
+
+    if (response.data?.success === false || String(response.data?.code) === '400') {
+      deleteError.value = response.data?.message ?? 'Role o‘chirilmadi'
+      return
+    }
+
+    showDeleteModal.value = false
+    deletingRole.value = null
+    await loadRoles()
+  } catch (error) {
+    const response = (error as { response?: { data?: { message?: string } } }).response
+    deleteError.value = response?.data?.message ?? 'Role o‘chirishda xatolik yuz berdi'
+  } finally {
+    deleteLoading.value = false
+  }
 }
 
 const columns = [
@@ -355,6 +392,7 @@ const handleUpdate = async () => {
                 dense
                 :icon="matDelete"
                 color="negative"
+                @click="openDeleteModal(props.row)"
             >
               <q-tooltip>
                 Delete
@@ -408,28 +446,28 @@ const handleUpdate = async () => {
 
         <q-card-section>
           <q-form ref="updateFormRef" @submit.prevent="handleUpdate">
-          <q-input
-              v-model="updateForm.name"
-              outlined
-              label="Role nomi"
-              class="q-mb-md"
-              :rules="[(value) => !!value?.trim() || 'Role nomini kiriting']"
-          />
+            <q-input
+                v-model="updateForm.name"
+                outlined
+                label="Role nomi"
+                class="q-mb-md"
+                :rules="[(value) => !!value?.trim() || 'Role nomini kiriting']"
+            />
 
-          <q-select
-              v-model="updateForm.status"
-              outlined
-              label="Status"
-              :options="statusOptions"
-              :rules="[(value) => !!value || 'Statusni tanlang']"
-          />
+            <q-select
+                v-model="updateForm.status"
+                outlined
+                label="Status"
+                :options="statusOptions"
+                :rules="[(value) => !!value || 'Statusni tanlang']"
+            />
 
-          <div
-              v-if="updateError"
-              class="text-negative q-mt-sm"
-          >
-            {{ updateError }}
-          </div>
+            <div
+                v-if="updateError"
+                class="text-negative q-mt-sm"
+            >
+              {{ updateError }}
+            </div>
           </q-form>
         </q-card-section>
 
@@ -446,6 +484,34 @@ const handleUpdate = async () => {
               label="Saqlash"
               :loading="updateLoading"
               @click="handleUpdate"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <!--  Delete role  -->
+    <q-dialog v-model="showDeleteModal" persistent>
+      <q-card style="min-width: 350px; max-width: 520px">
+        <q-card-section>
+          <div class="text-h6 text-weight-bold">Roleni o‘chirish</div>
+          <div class="q-mt-sm">
+            "{{ deletingRole?.name }}" rolini o‘chirmoqchimisiz?
+          </div>
+          <div v-if="deleteError" class="text-negative q-mt-sm">
+            {{ deleteError }}
+          </div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+              flat
+              color="negative"
+              label="Bekor qilish"
+              @click="showDeleteModal = false"/>
+          <q-btn
+              color="negative"
+              label="O‘chirish"
+              :loading="deleteLoading"
+              @click="handleDelete"
           />
         </q-card-actions>
       </q-card>

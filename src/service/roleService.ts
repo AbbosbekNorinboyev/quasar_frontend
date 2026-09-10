@@ -13,3 +13,7 @@ export function createRole(data: any) {
 export function updateRole(roleId: number, data: { name: string; status: string }) {
     return api.put(`${API_URL}/update/${roleId}`, data)
 }
+
+export function deleteRole(roleId: number) {
+    return api.delete(`${API_URL}/delete/${roleId}`)
+}

@@ -51,3 +51,7 @@ export function updateUser(userId: number, data: {
 }) {
     return api.put(`${API_URL}/update/${userId}`, data)
 }
+
+export function deleteUser(userId: number) {
+    return api.delete(`${API_URL}/delete/${userId}`)
+}

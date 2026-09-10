@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {onMounted, ref} from 'vue'
-import {getUsers, createUser, updateUser} from '@/service/userService.ts'
+import {getUsers, createUser, updateUser, deleteUser} from '@/service/userService.ts'
 import {getRoles} from '@/service/roleService.ts'
 import {matAdd, matDelete, matEdit, matRefresh, matSearch} from '@quasar/extras/material-icons'
 import {formatDate} from '@/utils/date.ts';
@@ -38,6 +38,10 @@ const updateError = ref('')
 const showPassword = ref(false)
 const createFormRef = ref()
 const updateFormRef = ref()
+const showDeleteModal = ref(false)
+const deleteLoading = ref(false)
+const deleteError = ref('')
+const deletingUser = ref<User | null>(null)
 
 // Edit qilinayotgan role ID
 const editingId = ref<number | null>(null)
@@ -102,6 +106,39 @@ const openUpdateModal = (user: any) => {
 
   updateError.value = ''
   showUpdateModal.value = true
+}
+
+const openDeleteModal = (user: User) => {
+  deletingUser.value = user
+  deleteError.value = ''
+  showDeleteModal.value = true
+}
+
+const handleDelete = async () => {
+  if (!deletingUser.value) {
+    return
+  }
+
+  deleteError.value = ''
+  deleteLoading.value = true
+
+  try {
+    const response = await deleteUser(deletingUser.value.id)
+
+    if (response.data?.success === false || String(response.data?.code) === '400') {
+      deleteError.value = response.data?.message ?? 'User o‘chirilmadi'
+      return
+    }
+
+    showDeleteModal.value = false
+    deletingUser.value = null
+    await loadUsers()
+  } catch (error) {
+    const response = (error as { response?: { data?: { message?: string } } }).response
+    deleteError.value = response?.data?.message ?? 'User o‘chirishda xatolik yuz berdi'
+  } finally {
+    deleteLoading.value = false
+  }
 }
 
 const columns = [
@@ -431,6 +468,7 @@ const handleUpdate = async () => {
                 dense
                 :icon="matDelete"
                 color="negative"
+                @click="openDeleteModal(props.row)"
             >
               <q-tooltip>
                 Delete
@@ -566,55 +604,55 @@ const handleUpdate = async () => {
 
         <q-card-section>
           <q-form ref="updateFormRef" class="q-gutter-sm" @submit.prevent="handleUpdate">
-          <q-input
-              outlined
-              label="Ism familiya"
-              v-model="updateForm.fullName"
-              :rules="[(value) => !!value?.trim() || 'Ism familiya kiriting']"
-          />
+            <q-input
+                outlined
+                label="Ism familiya"
+                v-model="updateForm.fullName"
+                :rules="[(value) => !!value?.trim() || 'Ism familiya kiriting']"
+            />
 
-          <q-input
-              outlined
-              label="Telefon raqami"
-              v-model="updateForm.phoneNumber"
-              :rules="[(value) => !!value?.trim() || 'Telefon raqamini kiriting']"
-          />
+            <q-input
+                outlined
+                label="Telefon raqami"
+                v-model="updateForm.phoneNumber"
+                :rules="[(value) => !!value?.trim() || 'Telefon raqamini kiriting']"
+            />
 
-          <q-input
-              outlined
-              label="Email"
-              v-model="updateForm.email"
-              :rules="[(value) => !!value?.trim() || 'Email kiriting']"
-          />
+            <q-input
+                outlined
+                label="Email"
+                v-model="updateForm.email"
+                :rules="[(value) => !!value?.trim() || 'Email kiriting']"
+            />
 
-          <q-input
-              outlined
-              label="Username"
-              v-model="updateForm.username"
-              :rules="[(value) => !!value?.trim() || 'Username kiriting']"
-          />
+            <q-input
+                outlined
+                label="Username"
+                v-model="updateForm.username"
+                :rules="[(value) => !!value?.trim() || 'Username kiriting']"
+            />
 
-          <q-input
-              outlined
-              label="Tugilgan sanasi"
-              v-model="updateForm.birthDate"
-              type="date"
-          />
+            <q-input
+                outlined
+                label="Tugilgan sanasi"
+                v-model="updateForm.birthDate"
+                type="date"
+            />
 
-          <q-select
-              v-model="updateForm.status"
-              outlined
-              label="Status"
-              :options="statusOptions"
-              :rules="[(value) => !!value || 'Statusni tanlang']"
-          />
+            <q-select
+                v-model="updateForm.status"
+                outlined
+                label="Status"
+                :options="statusOptions"
+                :rules="[(value) => !!value || 'Statusni tanlang']"
+            />
 
-          <div
-              v-if="updateError"
-              class="text-negative q-mt-sm"
-          >
-            {{ updateError }}
-          </div>
+            <div
+                v-if="updateError"
+                class="text-negative q-mt-sm"
+            >
+              {{ updateError }}
+            </div>
           </q-form>
         </q-card-section>
 
@@ -632,6 +670,34 @@ const handleUpdate = async () => {
               type="submit"
               :loading="updateLoading"
               @click="handleUpdate"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <!--  Delete user  -->
+    <q-dialog v-model="showDeleteModal" persistent>
+      <q-card style="min-width: 350px; max-width: 520px">
+        <q-card-section>
+          <div class="text-h6 text-weight-bold">Userni o‘chirish</div>
+          <div class="q-mt-sm">
+            "{{ deletingUser?.fullName }}" userini o‘chirmoqchimisiz?
+          </div>
+          <div v-if="deleteError" class="text-negative q-mt-sm">
+            {{ deleteError }}
+          </div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+              flat
+              color="negative"
+              label="Bekor qilish"
+              @click="showDeleteModal = false"/>
+          <q-btn
+              color="negative"
+              label="O‘chirish"
+              :loading="deleteLoading"
+              @click="handleDelete"
           />
         </q-card-actions>
       </q-card>
