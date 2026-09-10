@@ -31,7 +31,13 @@ type AuthPayload = {
   accessToken?: string
   access_token?: string
   token?: string
+  jwt?: string
+  jwtToken?: string
+  message?: string
   user?: AuthUser
+  data?: AuthPayload
+  result?: AuthPayload
+  payload?: AuthPayload
 }
 
 const storedUser = localStorage.getItem(USER_KEY)
@@ -40,17 +46,30 @@ export const authState = reactive<{ user: AuthUser | null }>({
   user: storedUser ? JSON.parse(storedUser) as AuthUser : null,
 })
 
-const extractPayload = (data: AuthPayload | { data?: AuthPayload }): AuthPayload => {
-  if ('data' in data && data.data) {
-    return data.data
+const extractPayload = (data: AuthPayload): AuthPayload => {
+  let payload = data
+
+  for (let depth = 0; depth < 4; depth += 1) {
+    const nested = payload.data ?? payload.result ?? payload.payload
+
+    if (!nested) {
+      break
+    }
+
+    payload = nested
   }
 
-  return data
+  return payload
 }
 
-const saveSession = (data: AuthPayload | { data?: AuthPayload }): void => {
+const saveSession = (data: AuthPayload): void => {
   const payload = extractPayload(data)
-  const token = payload.accessToken ?? payload.access_token ?? payload.token
+  const token = payload.accessToken
+    ?? payload.access_token
+    ?? payload.token
+    ?? payload.jwt
+    ?? payload.jwtToken
+    ?? payload.message
 
   if (!token) {
     throw new Error('Server JWT token qaytarmadi.')
@@ -70,7 +89,7 @@ export const register = (request: RegisterRequest) =>
   api.post('/users/register', request)
 
 export const login = async (request: LoginRequest) => {
-  const response = await api.post<AuthPayload | { data?: AuthPayload }>('/users/login', request)
+  const response = await api.post<AuthPayload>('/users/login', request)
   saveSession(response.data)
   return response
 }
