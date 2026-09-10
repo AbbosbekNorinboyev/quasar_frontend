@@ -272,7 +272,7 @@ onMounted(() => {
                 separator
             >
               <q-item
-                  v-for="user in users.slice(0, 5)"
+                  v-for="user in users.slice(0, 3)"
                   :key="user.id"
                   class="q-py-md"
               >
@@ -362,7 +362,7 @@ onMounted(() => {
                 separator
             >
               <q-item
-                  v-for="role in roles"
+                  v-for="role in roles.slice(0, 3)"
                   :key="role.id"
                   class="q-py-md"
               >
